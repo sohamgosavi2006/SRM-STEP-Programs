@@ -54,91 +54,90 @@ class GoodsBogie extends Bogie {
 // Train Class
 class Train {
     private String engineId;
-    private List<Bogie> bogies;
-    private Set<String> bogieIds; // UC3: HashSet to enforce unique IDs
+    private LinkedList<Bogie> bogies; // UC4: LinkedList to model physical chaining
+    private Set<String> bogieIds; // Unique IDs enforced from UC3
 
     public Train(String engineId) {
         this.engineId = engineId;
-        this.bogies = new ArrayList<>();
+        this.bogies = new LinkedList<>(); // UC4: Using LinkedList
         this.bogieIds = new HashSet<>();
     }
 
-    // UC3: Updated to prevent duplicate bogie IDs
     public void addBogie(Bogie bogie) {
         if (bogieIds.add(bogie.getId())) {
-            bogies.add(bogie);
-            System.out.println("Successfully added Bogie: " + bogie.getId());
+            bogies.add(bogie); // Adds to the end of the chain
+            System.out.println("Chained Bogie: " + bogie.getId());
         } else {
-            System.err.println("CRITICAL ERROR: Duplicate Bogie ID detected! [" + bogie.getId() + "] Registration rejected.");
+            System.err.println("Duplicate Bogie ID rejected: [" + bogie.getId() + "]");
         }
     }
 
-    // UC3: Updated to maintain set synchrony
+    // UC4: Adds a bogie to the front of the train (just behind engine)
+    public void addBogieAtFront(Bogie bogie) {
+        if (bogieIds.add(bogie.getId())) {
+            bogies.addFirst(bogie);
+            System.out.println("Chained Bogie at FRONT: " + bogie.getId());
+        } else {
+            System.err.println("Duplicate Bogie ID rejected: [" + bogie.getId() + "]");
+        }
+    }
+
     public boolean removeBogie(String bogieId) {
         Iterator<Bogie> iterator = bogies.iterator();
         while (iterator.hasNext()) {
             if (iterator.next().getId().equals(bogieId)) {
                 iterator.remove();
-                bogieIds.remove(bogieId); // Keep the set in sync
-                System.out.println("Successfully removed Bogie: " + bogieId);
+                bogieIds.remove(bogieId);
+                System.out.println("Unchained Bogie: " + bogieId);
                 return true;
             }
         }
-        System.out.println("Error: Bogie " + bogieId + " not found in consist.");
         return false;
     }
 
-    // UC2: Find Bogie by ID
     public Bogie findBogie(String bogieId) {
         for (Bogie b : bogies) {
-            if (b.getId().equals(bogieId)) {
-                return b;
-            }
+            if (b.getId().equals(bogieId)) return b;
         }
         return null;
     }
 
     public void displayConsistSummary() {
-        System.out.println("\n===== TRAIN CONSIST SUMMARY =====");
-        System.out.println("Engine ID: " + engineId);
-        System.out.println("Total Bogies: " + bogies.size());
-        System.out.println("-----------------------------------");
+        System.out.println("\n===== TRAIN CHANNELS (LinkedList) =====");
+        System.out.println("Locomotive -> " + engineId);
+        int count = 1;
         for (Bogie b : bogies) {
-            b.displayDetails();
+            System.out.println("  [" + (count++) + "] " + b.getId() + " (" + b.type + ")");
         }
-        System.out.println("===================================\n");
+        System.out.println("Total units in consist: " + count);
+        System.out.println("========================================\n");
     }
 }
 
 // Main Class
 public class TrainConsistApp {
     public static void main(String[] args) {
-        System.out.println("--- Train Consist Management App (UC3: Unique Bogie IDs) ---");
+        System.out.println("--- Train Consist Management App (UC4: LinkedList Chaining) ---");
 
         // 1. Initialize Train
-        Train train = new Train("Bharat-Gati-123");
+        Train train = new Train("GatiShakti-Exp-501");
 
-        // 2. Add Unique Bogies
+        // 2. Chaining Bogies in sequence (LinkedList add)
+        System.out.println("Building the train consist...");
         train.addBogie(new PassengerBogie("P-SL1", "Sleeper", 72, 60));
-        train.addBogie(new PassengerBogie("P-AC1", "AC Chair Car", 60, 40));
-        
-        // 3. UC3: Demonstrate Duplicate ID Prevention
-        System.out.println("\nAttempting to add duplicate Bogie ID: P-SL1...");
-        train.addBogie(new PassengerBogie("P-SL1", "Sleeper", 72, 0)); // Same ID but different instance
+        train.addBogie(new PassengerBogie("P-AC1", "AC Chair", 60, 40));
+        train.addBogie(new GoodsBogie("G-COAL1", "Wagon", "Coal", true));
 
-        // 4. Add more unique bogies
-        train.addBogie(new GoodsBogie("G-COAL1", "Open Wagon", "Coal", true));
+        // 3. Demonstrate adding a special bogie at the front (LinkedList addFirst)
+        System.out.println("\nUpdating consist: Adding VIP Coach at the front...");
+        train.addBogieAtFront(new PassengerBogie("P-VIP1", "Executive", 20, 5));
 
-        // 5. Display Summary to verify count
+        // 4. Display ordered consist
         train.displayConsistSummary();
 
-        // 6. Demonstrate Removal and Re-addition
-        String removeId = "P-AC1";
-        System.out.println("Removing " + removeId + " to test re-addition...");
-        train.removeBogie(removeId);
-
-        System.out.println("\nRe-adding " + removeId + "...");
-        train.addBogie(new PassengerBogie("P-AC1", "AC Chair Car", 60, 0));
+        // 5. Demonstrate removal from chain
+        System.out.println("Emergency Operation: Detaching " + "G-COAL1" + "...");
+        train.removeBogie("G-COAL1");
 
         // Final State
         train.displayConsistSummary();
