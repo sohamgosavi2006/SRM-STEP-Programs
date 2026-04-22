@@ -4,20 +4,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TrainConsistManagementSystem {
 
-    static boolean binarySearch(String[] arr, String key) {
-        int low = 0;
-        int high = arr.length - 1;
+    static boolean searchBogie(List<String> bogies, String key) {
+        if (bogies.isEmpty()) {
+            throw new IllegalStateException("No bogies available for search");
+        }
 
-        while (low <= high) {
-            int mid = (low + high) / 2;
-            int cmp = key.compareTo(arr[mid]);
-
-            if (cmp == 0) {
+        for (String id : bogies) {
+            if (id.equals(key)) {
                 return true;
-            } else if (cmp > 0) {
-                low = mid + 1;
-            } else {
-                high = mid - 1;
             }
         }
         return false;
@@ -26,53 +20,62 @@ public class TrainConsistManagementSystem {
     public static void main(String[] args) {
 
         System.out.println("========================================");
-        System.out.println(" UC19 - Binary Search for Bogie ID ");
+        System.out.println(" UC20 - Exception Handling During Search ");
         System.out.println("========================================\n");
 
-        String[] bogieIDs = {"BG101","BG205","BG309","BG412","BG550"};
-        String searchKey = "BG309";
+        List<String> bogieIDs = new ArrayList<>();
+        bogieIDs.add("BG101");
+        bogieIDs.add("BG205");
+        bogieIDs.add("BG309");
 
-        System.out.println("Sorted Bogie IDs: " + Arrays.toString(bogieIDs));
-        System.out.println("Searching for: " + searchKey);
+        String searchKey = "BG205";
 
-        boolean found = binarySearch(bogieIDs, searchKey);
+        try {
+            boolean found = searchBogie(bogieIDs, searchKey);
 
-        if (found) {
-            System.out.println("Bogie found in the train.");
-        } else {
-            System.out.println("Bogie not found.");
+            if (found) {
+                System.out.println("Bogie found in the train.");
+            } else {
+                System.out.println("Bogie not found.");
+            }
+
+        } catch (IllegalStateException e) {
+            System.out.println("Exception: " + e.getMessage());
         }
 
-        System.out.println("\nUC19 execution completed...");
+        System.out.println("\nUC20 execution completed...");
     }
 
     @Test
-    void testSearch_BogieFound() {
-        String[] arr = {"BG101","BG205","BG309","BG412","BG550"};
-        assertTrue(binarySearch(arr, "BG309"));
+    void testSearch_WithValidData() {
+        List<String> list = Arrays.asList("BG101","BG205","BG309");
+        assertTrue(searchBogie(list, "BG205"));
     }
 
     @Test
     void testSearch_BogieNotFound() {
-        String[] arr = {"BG101","BG205","BG309","BG412","BG550"};
-        assertFalse(binarySearch(arr, "BG999"));
+        List<String> list = Arrays.asList("BG101","BG205","BG309");
+        assertFalse(searchBogie(list, "BG999"));
+    }
+
+    @Test
+    void testSearch_EmptyListThrowsException() {
+        List<String> list = new ArrayList<>();
+        Exception ex = assertThrows(IllegalStateException.class, () -> {
+            searchBogie(list, "BG101");
+        });
+        assertEquals("No bogies available for search", ex.getMessage());
     }
 
     @Test
     void testSearch_FirstElementMatch() {
-        String[] arr = {"BG101","BG205","BG309"};
-        assertTrue(binarySearch(arr, "BG101"));
+        List<String> list = Arrays.asList("BG101","BG205","BG309");
+        assertTrue(searchBogie(list, "BG101"));
     }
 
     @Test
-    void testSearch_LastElementMatch() {
-        String[] arr = {"BG101","BG205","BG550"};
-        assertTrue(binarySearch(arr, "BG550"));
-    }
-
-    @Test
-    void testSearch_SingleElementArray() {
-        String[] arr = {"BG101"};
-        assertTrue(binarySearch(arr, "BG101"));
+    void testSearch_SingleElementList() {
+        List<String> list = Arrays.asList("BG101");
+        assertTrue(searchBogie(list, "BG101"));
     }
 }
