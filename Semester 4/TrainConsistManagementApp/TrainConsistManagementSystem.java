@@ -4,74 +4,61 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TrainConsistManagementSystem {
 
-    static void bubbleSort(int[] arr) {
-        int n = arr.length;
-        for (int i = 0; i < n - 1; i++) {
-            for (int j = 0; j < n - i - 1; j++) {
-                if (arr[j] > arr[j + 1]) {
-                    int temp = arr[j];
-                    arr[j] = arr[j + 1];
-                    arr[j + 1] = temp;
-                }
-            }
-        }
+    static void sortBogieNames(String[] arr) {
+        Arrays.sort(arr);
     }
 
     public static void main(String[] args) {
 
         System.out.println("========================================");
-        System.out.println(" UC16 - Sort Passenger Bogies by Capacity ");
+        System.out.println(" UC17 - Sort Bogie Names ");
         System.out.println("========================================\n");
 
-        int[] capacities = {72, 56, 24, 70, 60};
+        String[] bogieNames = {"Sleeper", "AC Chair", "First Class", "General", "Luxury"};
 
         System.out.println("Before Sorting:");
-        for (int c : capacities) {
-            System.out.print(c + " ");
-        }
+        System.out.println(Arrays.toString(bogieNames));
 
-        bubbleSort(capacities);
+        sortBogieNames(bogieNames);
 
-        System.out.println("\n\nAfter Sorting:");
-        for (int c : capacities) {
-            System.out.print(c + " ");
-        }
+        System.out.println("\nAfter Sorting:");
+        System.out.println(Arrays.toString(bogieNames));
 
-        System.out.println("\n\nUC16 execution completed...");
+        System.out.println("\nUC17 execution completed...");
     }
 
     @Test
-    void testSort_BasicSorting() {
-        int[] arr = {72, 56, 24, 70, 60};
-        bubbleSort(arr);
-        assertArrayEquals(new int[]{24, 56, 60, 70, 72}, arr);
+    void testSort_BasicAlphabeticalSorting() {
+        String[] arr = {"Sleeper","AC Chair","First Class","General","Luxury"};
+        sortBogieNames(arr);
+        assertArrayEquals(new String[]{"AC Chair","First Class","General","Luxury","Sleeper"}, arr);
+    }
+
+    @Test
+    void testSort_UnsortedInput() {
+        String[] arr = {"Luxury","General","Sleeper","AC Chair"};
+        sortBogieNames(arr);
+        assertArrayEquals(new String[]{"AC Chair","General","Luxury","Sleeper"}, arr);
     }
 
     @Test
     void testSort_AlreadySortedArray() {
-        int[] arr = {24, 56, 60, 70, 72};
-        bubbleSort(arr);
-        assertArrayEquals(new int[]{24, 56, 60, 70, 72}, arr);
+        String[] arr = {"AC Chair","First Class","General"};
+        sortBogieNames(arr);
+        assertArrayEquals(new String[]{"AC Chair","First Class","General"}, arr);
     }
 
     @Test
-    void testSort_DuplicateValues() {
-        int[] arr = {72, 56, 56, 24};
-        bubbleSort(arr);
-        assertArrayEquals(new int[]{24, 56, 56, 72}, arr);
+    void testSort_DuplicateBogieNames() {
+        String[] arr = {"Sleeper","AC Chair","Sleeper","General"};
+        sortBogieNames(arr);
+        assertArrayEquals(new String[]{"AC Chair","General","Sleeper","Sleeper"}, arr);
     }
 
     @Test
     void testSort_SingleElementArray() {
-        int[] arr = {50};
-        bubbleSort(arr);
-        assertArrayEquals(new int[]{50}, arr);
-    }
-
-    @Test
-    void testSort_AllEqualValues() {
-        int[] arr = {40, 40, 40};
-        bubbleSort(arr);
-        assertArrayEquals(new int[]{40, 40, 40}, arr);
+        String[] arr = {"Sleeper"};
+        sortBogieNames(arr);
+        assertArrayEquals(new String[]{"Sleeper"}, arr);
     }
 }
